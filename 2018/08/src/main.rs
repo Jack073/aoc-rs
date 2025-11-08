@@ -34,6 +34,25 @@ impl Node {
             .sum::<usize>()
             + self.metadata.iter().sum::<usize>()
     }
+
+    fn node_value(&self) -> usize {
+        if self.children.is_empty() {
+            self.metadata.iter().sum::<usize>()
+        } else {
+            self.metadata
+                .iter()
+                .map(|metadata| {
+                    if *metadata == 0 {
+                        return 0;
+                    }
+                    match self.children.get(*metadata - 1) {
+                        Some(child) => child.node_value(),
+                        None => 0,
+                    }
+                })
+                .sum()
+        }
+    }
 }
 
 fn part_one() {
@@ -43,10 +62,7 @@ fn part_one() {
         .read_to_string(&mut s)
         .expect("read error");
 
-    let noded_tree = Node::parse(
-        &mut s.split(" ")
-            .map(|n| n.parse::<usize>().unwrap())
-    );
+    let noded_tree = Node::parse(&mut s.split(" ").map(|n| n.parse::<usize>().unwrap()));
 
     match noded_tree {
         Some(n) => {
@@ -58,6 +74,25 @@ fn part_one() {
     }
 }
 
+fn part_two() {
+    let mut s = String::new();
+    File::open("input.txt")
+        .expect("input file")
+        .read_to_string(&mut s)
+        .expect("read error");
+
+    let noded_tree = Node::parse(&mut s.split(" ").map(|n| n.parse::<usize>().unwrap()));
+
+    match noded_tree {
+        Some(n) => {
+            println!("{}", n.node_value());
+        }
+        None => {
+            println!("error");
+        }
+    }
+}
+
 fn main() {
-    part_one();
+    part_two();
 }
