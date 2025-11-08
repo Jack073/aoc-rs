@@ -1,3 +1,4 @@
+use std::collections::HashSet;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 
@@ -12,6 +13,20 @@ fn part_one() -> isize {
     get_frequencies().sum()
 }
 
+fn part_two() -> isize {
+    let mut set = HashSet::new();
+
+    get_frequencies()
+        .collect::<Vec<isize>>()
+        .iter()
+        .cycle()
+        .scan(0, |acc, x| {
+            *acc += x;
+            Some(*acc)
+        }).find(|s| !set.insert(*s))
+        .unwrap()
+}
+
 fn main() {
-    println!("{}", part_one());
+    println!("{}", part_two());
 }
