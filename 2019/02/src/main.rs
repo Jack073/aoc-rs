@@ -45,6 +45,29 @@ fn part_one() -> usize {
     compute(&mut opcodes, 12, 2)
 }
 
+fn part_two() -> usize {
+    let mut s = String::new();
+
+    File::open("input.txt")
+        .expect("input file")
+        .read_to_string(&mut s)
+        .expect("read error");
+
+    let opcodes = s
+        .split(",")
+        .map(|n| n.parse::<usize>().expect("parse err"))
+        .collect::<Vec<_>>();
+
+    for noun in 0..=99 {
+        for verb in 0..=99 {
+            if compute(&mut opcodes.clone(), noun, verb) == 19690720 {
+                return verb + (100 * noun);
+            }
+        }
+    }
+    panic!("no solution found")
+}
+
 fn main() {
-    println!("{}", part_one());
+    println!("{}", part_two());
 }
