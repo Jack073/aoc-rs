@@ -26,12 +26,10 @@ fn react(n: String) -> String {
                                 has_changed = true;
                                 c = chars.next();
                             }
-                        },
-                        None => {
-                            new_string.push(a as char)
                         }
+                        None => new_string.push(a as char),
                     }
-                },
+                }
                 None => break,
             }
         }
@@ -52,6 +50,23 @@ fn part_one() -> usize {
     react(s).len()
 }
 
+fn part_two() -> usize {
+    let mut s = String::new();
+    File::open("input.txt")
+        .expect("input file")
+        .read_to_string(&mut s)
+        .expect("read error");
+
+    (0..26)
+        .map(|n| {
+            s.replace(('a' as u8 + n) as char, "")
+                .replace(('A' as u8 + n) as char, "")
+        })
+        .map(|s| react(s).len())
+        .min()
+        .expect("no length")
+}
+
 fn main() {
-    println!("{}", part_one());
+    println!("{}", part_two());
 }
