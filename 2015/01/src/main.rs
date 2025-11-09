@@ -22,6 +22,17 @@ fn part_one() -> isize {
     get_sequence().sum()
 }
 
+fn part_two() -> isize {
+    get_sequence()
+        .scan(0, |acc, x| {
+            *acc += x;
+            Some(*acc)
+        })
+        .position(|n| n == -1)
+        .unwrap() as isize
+        + 1
+}
+
 fn main() {
-    println!("{}", part_one());
+    println!("{}", part_two());
 }
