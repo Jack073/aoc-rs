@@ -22,6 +22,14 @@ impl Operation {
             Operation::Toggle => !state,
         }
     }
+
+    fn apply_part_two(&self, state: usize) -> usize {
+        match self {
+            Operation::On => state + 1,
+            Operation::Off => state.max(1) - 1,
+            Operation::Toggle => state + 2,
+        }
+    }
 }
 
 struct Command {
@@ -60,6 +68,14 @@ impl Command {
             }
         }
     }
+
+    fn apply_part_two(&self, state: &mut Vec<Vec<usize>>) {
+        for x in self.left_x..=self.right_x {
+            for y in self.left_y..=self.right_y {
+                state[x][y] = self.op.apply_part_two(state[x][y]);
+            }
+        }
+    }
 }
 
 fn part_one() -> usize {
@@ -80,6 +96,21 @@ fn part_one() -> usize {
         .sum()
 }
 
+fn part_two() -> usize {
+    let mut lights = vec![vec![0usize; 1000]; 1000];
+
+    let _ = BufReader::new(File::open("input.txt").expect("input file"))
+        .lines()
+        .filter_map(|l| match l {
+            Ok(s) => Some(s),
+            Err(_) => None,
+        })
+        .map(|line| Command::new(line))
+        .for_each(|c| c.apply_part_two(&mut lights));
+
+    lights.iter().map(|row| row.iter().sum::<usize>()).sum()
+}
+
 fn main() {
-    println!("{}", part_one());
+    println!("{}", part_two());
 }
