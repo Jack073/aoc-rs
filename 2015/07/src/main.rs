@@ -170,6 +170,40 @@ fn part_one() -> u16 {
     a.solve(&gates, &mut HashMap::new())
 }
 
+fn part_two() -> u16 {
+    let mut gates = BufReader::new(File::open("input.txt").expect("input file"))
+        .lines()
+        .filter_map(|l| match l {
+            Ok(n) => Some(n),
+            Err(_) => None,
+        })
+        .map(|line| Gate::new(line))
+        .collect::<Vec<_>>();
+
+    {
+        let a = gates
+            .iter()
+            .find(|gate| gate.out == "a")
+            .expect("gate a not found");
+
+        let new_b = a.solve(&gates, &mut HashMap::new());
+
+        let b = gates
+            .iter_mut()
+            .find(|g| g.out == "b")
+            .expect("b not found");
+        b.op = Operation::NOOP;
+        b.lhs = InputType::Constant(new_b);
+        b.rhs = None;
+    }
+
+    gates
+        .iter()
+        .find(|gate| gate.out == "a")
+        .expect("gate a not found")
+        .solve(&gates, &mut HashMap::new())
+}
+
 fn main() {
-    println!("{}", part_one());
+    println!("{}", part_two());
 }
