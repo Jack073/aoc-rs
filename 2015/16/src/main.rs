@@ -40,6 +40,29 @@ impl Sue {
         .all(|v| v)
     }
 
+    fn matches_part_two(&self, cmp: &Sue) -> bool {
+        [
+            cmp.children
+                .map(|children| children == self.children.unwrap()),
+            cmp.cats.map(|cats| cats > self.cats.unwrap()),
+            cmp.samoyeds
+                .map(|samoyeds| samoyeds == self.samoyeds.unwrap()),
+            cmp.pomeranians
+                .map(|pomeranians| pomeranians < self.pomeranians.unwrap()),
+            cmp.akitas.map(|akitas| akitas == self.akitas.unwrap()),
+            cmp.vizslas.map(|vizslas| vizslas == self.vizslas.unwrap()),
+            cmp.goldfish
+                .map(|goldfish| goldfish < self.goldfish.unwrap()),
+            cmp.trees.map(|trees| trees > self.trees.unwrap()),
+            cmp.cars.map(|cars| cars == self.cars.unwrap()),
+            cmp.perfumes
+                .map(|perfumes| perfumes == self.perfumes.unwrap()),
+        ]
+            .into_iter()
+            .filter_map(|n| n)
+            .all(|v| v)
+    }
+
     fn construct(line: String) -> Self {
         let mut split = line.split_ascii_whitespace();
 
@@ -142,6 +165,34 @@ fn part_one() -> isize {
         .id
 }
 
+fn part_two() -> isize {
+    let target_sue = Sue {
+        id: 0,
+        children: Some(3),
+        cats: Some(7),
+        samoyeds: Some(2),
+        pomeranians: Some(3),
+        akitas: Some(0),
+        vizslas: Some(0),
+        goldfish: Some(5),
+        trees: Some(3),
+        cars: Some(2),
+        perfumes: Some(1),
+    };
+
+    BufReader::new(File::open("input.txt").expect("file open error"))
+        .lines()
+        .filter_map(|n| match n {
+            Ok(a) => Some(a),
+            Err(_) => return None,
+        })
+        .map(Sue::construct)
+        .find(|sue| target_sue.matches_part_two(&sue))
+        .expect("missing sue")
+        .id
+}
+
+
 fn main() {
-    println!("{}", part_one());
+    println!("{}", part_two());
 }
