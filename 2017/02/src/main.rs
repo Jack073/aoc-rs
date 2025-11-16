@@ -21,6 +21,40 @@ fn part_one() -> usize {
         .sum()
 }
 
+fn part_two() -> usize {
+    BufReader::new(File::open("input.txt").expect("input file error"))
+        .lines()
+        .filter_map(|l| match l {
+            Ok(n) => Some(n),
+            Err(_) => None,
+        })
+        .map(|line| {
+            let values = line
+                .split_ascii_whitespace()
+                .map(|n| n.parse::<usize>().expect("number parse fail"))
+                .collect::<Vec<_>>();
+            values
+                .iter()
+                .filter_map(|n| {
+                    match values.iter().find(|&m| {
+                        if m == n {
+                            false
+                        } else if m % n == 0 {
+                            true
+                        } else {
+                            false
+                        }
+                    }) {
+                        Some(d) => Some(d / n),
+                        None => None,
+                    }
+                })
+                .next()
+                .expect("no match")
+        })
+        .sum()
+}
+
 fn main() {
-    println!("{}", part_one());
+    println!("{}", part_two());
 }
