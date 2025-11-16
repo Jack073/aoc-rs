@@ -30,6 +30,20 @@ fn part_one() {
     );
 }
 
+fn part_two() {
+    println!(
+        "{}",
+        look_and_say(
+            "1113222113"
+                .chars()
+                .map(|n| (n as u16 as usize) - '0' as u16 as usize)
+                .collect::<Vec<_>>(),
+            50
+        )
+        .len()
+    );
+}
+
 fn main() {
-    part_one();
+    part_two();
 }
