@@ -33,6 +33,42 @@ fn part_one() -> usize {
         .count()
 }
 
+fn part_two() -> usize {
+    let sizes = BufReader::new(File::open("input.txt").expect("input file error"))
+        .lines()
+        .filter_map(|l| match l {
+            Ok(n) => Some(n),
+            Err(_) => None,
+        })
+        .map(|line| line.parse::<isize>().expect("invalid int"))
+        .collect::<Vec<_>>();
+
+    *(0..(1 << 20))
+        .map(|n| {
+            let combination = (0..20)
+                .filter_map(|and| {
+                    if n.bitand(1 << and) > 0 {
+                        Some(and)
+                    } else {
+                        None
+                    }
+                })
+                .map(|index| sizes[index])
+                .collect::<Vec<_>>();
+            (combination.iter().sum::<isize>(), combination.len())
+        })
+        .filter(|&c| c.0 == 150)
+        .map(|c| c.1)
+        .fold(&mut [0usize; 20], |state, combination| {
+            state[combination] += 1;
+            state
+        })
+        .into_iter()
+        .filter(|c| *c > &mut 0)
+        .min()
+        .unwrap()
+}
+
 fn main() {
-    println!("{}", part_one());
+    println!("{}", part_two());
 }
