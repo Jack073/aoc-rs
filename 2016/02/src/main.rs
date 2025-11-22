@@ -88,6 +88,25 @@ impl Relationship {
     }
 }
 
+fn calculate_buttons(num_buttons: usize, relationships: &[Relationship]) -> Vec<Button> {
+    let mut buttons = (0..(num_buttons + 1))
+        .map(|n| n as u8)
+        .map(Button::with_value)
+        .collect::<Vec<_>>();
+
+    relationships.iter().for_each(|relationship| {
+        buttons[relationship.from_button as usize]
+            .configure(&relationship.relationship, relationship.to_button);
+
+        buttons[relationship.to_button as usize].configure(
+            &relationship.relationship.opposite(),
+            relationship.from_button,
+        );
+    });
+
+    buttons
+}
+
 fn part_one() -> usize {
     // Using 0..10 instead of 0..9 lets us keep the indexes the same as the values, it's probably
     // not the most efficient way to do it, but it simplified the code slightly.
@@ -140,6 +159,52 @@ fn part_one() -> usize {
         .expect("int parse error")
 }
 
+fn part_two() -> String {
+    let buttons = calculate_buttons(
+        14,
+        &[
+            Relationship::new(1, 3, Direction::Down),
+            Relationship::new(2, 3, Direction::Right),
+            Relationship::new(2, 6, Direction::Down),
+            Relationship::new(3, 4, Direction::Right),
+            Relationship::new(3, 7, Direction::Down),
+            Relationship::new(4, 8, Direction::Down),
+            Relationship::new(5, 6, Direction::Right),
+            Relationship::new(6, 7, Direction::Right),
+            Relationship::new(6, 10, Direction::Down),
+            Relationship::new(7, 8, Direction::Right),
+            Relationship::new(7, 11, Direction::Down),
+            Relationship::new(8, 9, Direction::Right),
+            Relationship::new(8, 12, Direction::Down),
+            Relationship::new(10, 11, Direction::Right),
+            Relationship::new(11, 12, Direction::Right),
+            Relationship::new(11, 13, Direction::Down),
+        ],
+    );
+
+    BufReader::new(File::open("input.txt").expect("input file error"))
+        .lines()
+        .map(|line| line.unwrap())
+        .map(|line| {
+            let mut btn = &buttons[5];
+
+            line.chars().for_each(|c| {
+                btn = &buttons[btn.move_if_valid(&Direction::from_char(c))];
+            });
+
+            btn.value
+        })
+        .map(|value| {
+            if value < 10 {
+                value + ('0' as u8)
+            } else {
+                value + ('A' as u8) - 10
+            }
+        })
+        .map(|c| c as char)
+        .collect::<String>()
+}
+
 fn main() {
-    println!("{}", part_one());
+    println!("{}", part_two());
 }
