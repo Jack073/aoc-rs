@@ -58,6 +58,30 @@ fn part_one() -> usize {
     decompress(s).len()
 }
 
+fn part_two() -> usize {
+    // So... I was half right. I doubt this is the optimal way to do this.
+    // I suspect the better way would involve calculating the size with a tree of decompression
+    // markers / zones and multiplication. Since I had tried to be smart in the first place, I
+    // opted to stick with that method to see if it was even viable.
+    // On my 32 GB machine, this worked (fine). I did use release mode.
+    // I suspect in a later year I might not have gotten away with this, but if it works it works.
+    // I may come back at a later date to retry this one properly.
+    let mut s = String::new();
+    File::open("input.txt")
+        .expect("input file read error")
+        .read_to_string(&mut s)
+        .unwrap();
+
+    let mut old_len = s.len() + 1;
+
+    while s.len() != old_len {
+        old_len = s.len();
+        s = decompress(s);
+    }
+
+    s.len()
+}
+
 fn main() {
-    println!("{}", part_one());
+    println!("{}", part_two());
 }
