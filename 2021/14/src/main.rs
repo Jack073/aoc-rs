@@ -153,6 +153,10 @@ fn part_one() -> usize {
     process_reactions(10)
 }
 
+fn part_two() -> usize {
+    process_reactions(40)
+}
+
 fn main() {
-    println!("{}", part_one());
+    println!("{}", part_two());
 }
