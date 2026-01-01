@@ -1,7 +1,7 @@
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 
-fn part_one() -> i32 {
+fn get_seats() -> impl Iterator<Item = i32> {
     BufReader::new(File::open("input.txt").unwrap())
         .lines()
         .map(|line| line.unwrap())
@@ -32,10 +32,22 @@ fn part_one() -> i32 {
 
             (low_row * 8) + low_col
         })
-        .max()
+}
+
+fn part_one() -> i32 {
+    get_seats().max().unwrap()
+}
+
+fn part_two() -> i32 {
+    let mut seats = get_seats().collect::<Vec<_>>();
+
+    seats
+        .iter()
+        .find(|&s1| (!seats.contains(&(s1 + 1))) && seats.contains(&(s1 + 2)))
         .unwrap()
+        + 1
 }
 
 fn main() {
-    println!("{}", part_one());
+    println!("{}", part_two());
 }
