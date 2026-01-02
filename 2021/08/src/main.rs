@@ -277,6 +277,42 @@ fn part_one() -> usize {
         .sum::<usize>()
 }
 
+fn part_two() -> usize {
+    BufReader::new(File::open("input.txt").unwrap())
+        .lines()
+        .map(|l| l.unwrap())
+        .map(|l| {
+            let (raw_samples, display) = l.split_once(" | ").unwrap();
+
+            let samples = raw_samples
+                .split_ascii_whitespace()
+                .map(|s| s.to_owned())
+                .collect::<Vec<_>>();
+            let mut dict = ['0'; 7];
+
+            build_dict(samples, &mut dict);
+
+            display
+                .split_ascii_whitespace()
+                .map(|digit| {
+                    Segment::from(
+                        digit
+                            .chars()
+                            .map(|c| {
+                                Segment::digit_to_char(
+                                    dict.iter().position(|&d| c == d).unwrap() as u8
+                                )
+                            })
+                            .collect::<String>(),
+                    )
+                })
+                .map(|s| calculate_digit(s.inner) as usize)
+                .reduce(|a, b| (a * 10) + b)
+                .unwrap()
+        })
+        .sum::<usize>()
+}
+
 fn main() {
-    println!("{}", part_one());
+    println!("{}", part_two());
 }
