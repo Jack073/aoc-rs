@@ -38,7 +38,10 @@ impl From<String> for LogLine {
     }
 }
 
-fn part_one() -> usize {
+fn get_guard_data<'a, T>(f: T) -> usize
+where
+    T: Fn(Box<dyn Iterator<Item = (usize, [usize; 60])>>) -> usize,
+{
     let mut logs = BufReader::new(File::open("input.txt").unwrap())
         .lines()
         .map(|line| line.unwrap())
@@ -47,26 +50,24 @@ fn part_one() -> usize {
 
     logs.sort_by_key(|log| log.timestamp);
 
-    let mut guard_num = 0;
-
-    logs.iter()
-        .chunk_by(|g| match g.log_type {
-            LogType::Awaken => guard_num,
-            LogType::Asleep => guard_num,
-            LogType::BeginShift(n) => {
-                guard_num = n;
-                n
+    f(Box::new(
+        logs.chunk_by(|a, b| {
+            if let LogType::BeginShift(_) = b.log_type {
+                false
+            } else {
+                true
             }
         })
         .into_iter()
-        .sorted_by_key(|c| c.0)
-        .into_iter()
-        .map(|(id, entries)| {
+        .map(|entries| {
             let mut data = [0; 60];
             let mut sleeping_from = None;
+            let mut id = 0;
 
             entries.into_iter().for_each(|entry| match entry.log_type {
-                LogType::BeginShift(_) => {}
+                LogType::BeginShift(g) => {
+                    id = g;
+                }
                 LogType::Asleep => {
                     sleeping_from = Some(entry.timestamp);
                 }
@@ -79,13 +80,14 @@ fn part_one() -> usize {
 
             (id, data)
         })
-        .sorted_by_key(|k| k.0)
-        .chunk_by(|k| k.0)
+        .sorted_by_key(|&(k, _)| k)
+        .into_iter()
+        .chunk_by(|(k, _)| *k)
         .into_iter()
         .map(|(key, data_group)| {
             (
                 key,
-                data_group.into_iter().fold([0; 60], |mut acc, e| {
+                data_group.into_iter().fold([0usize; 60], |mut acc, e| {
                     for (i, elem) in e.1.iter().enumerate() {
                         acc[i] += *elem;
                     }
@@ -94,18 +96,48 @@ fn part_one() -> usize {
                 }),
             )
         })
-        .max_by_key(|m| m.1.iter().sum::<usize>())
-        .map(|(key, data)| {
-            key * data
-                .iter()
-                .enumerate()
-                .max_by_key(|&(_, b)| b)
-                .map(|(a, _)| a)
-                .unwrap()
+        .into_iter()
+        .collect::<Vec<_>>()
+        .into_iter(),
+    ))
+}
+
+fn part_one() -> usize {
+    get_guard_data(|data| {
+        data.max_by_key(|m| m.1.iter().sum::<usize>())
+            .map(|(key, data)| {
+                key * data
+                    .iter()
+                    .enumerate()
+                    .max_by_key(|&(_, b)| b)
+                    .map(|(a, _)| a)
+                    .unwrap()
+            })
+            .unwrap()
+    })
+}
+
+fn part_two() -> usize {
+    struct GuardData {
+        guard: usize,
+        minute: usize,
+        count: usize,
+    }
+    get_guard_data(|res| {
+        res.map(|(id, data)| {
+            let (minute, count) = data.iter().enumerate().max_by_key(|&(_, b)| b).unwrap();
+            GuardData {
+                guard: id,
+                minute,
+                count: *count,
+            }
         })
+        .max_by_key(|data| data.count)
+        .map(|data| data.guard * data.minute)
         .unwrap()
+    })
 }
 
 fn main() {
-    println!("{}", part_one());
+    println!("{}", part_two());
 }
