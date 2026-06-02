@@ -78,6 +78,20 @@ fn part_one() -> usize {
         .count()
 }
 
+fn part_two() -> usize {
+    BufReader::new(File::open("input.txt").unwrap())
+        .lines()
+        .map(|l| l.unwrap().parse::<isize>().unwrap())
+        .windows::<3>()
+        .unwrap()
+        .map(|window| window.iter().sum::<isize>())
+        .windows::<2>()
+        .expect("iterator too short")
+        .map(|[a, b]| a - b)
+        .filter(|n| *n < 0)
+        .count()
+}
+
 fn main() {
-    println!("{}", part_one());
+    println!("{}", part_two());
 }
