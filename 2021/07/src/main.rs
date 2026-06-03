@@ -19,6 +19,35 @@ fn part_one() -> usize {
         .unwrap()
 }
 
+fn part_two() -> usize {
+    let nums = BufReader::new(File::open("input.txt").unwrap())
+        .split(b',')
+        .map(Result::unwrap)
+        .map(String::from_utf8)
+        .map(Result::unwrap)
+        .map(|n| n.parse::<usize>().unwrap())
+        .collect::<Vec<usize>>();
+
+    let min = *nums.iter().min().unwrap();
+    let max = *nums.iter().max().unwrap();
+
+    (min..=max)
+        .map(|n| {
+            nums.iter()
+                .map(|&x| {
+                    let delta = x.abs_diff(n);
+                    if delta % 2 == 1 {
+                        1 + (delta + 2) * (delta / 2)
+                    } else {
+                        (delta + 1) * (delta / 2)
+                    }
+                })
+                .sum::<usize>()
+        })
+        .min()
+        .unwrap()
+}
+
 fn main() {
-    println!("{}", part_one());
+    println!("{}", part_two());
 }
