@@ -32,6 +32,11 @@ fn part_one() -> usize {
     simulate_growth(fish, 80)
 }
 
+fn part_two() -> usize {
+    let fish = gather_fish();
+    simulate_growth(fish, 256)
+}
+
 fn main() {
-    println!("{}", part_one());
+    println!("{}", part_two());
 }
